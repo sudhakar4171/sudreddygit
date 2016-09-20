@@ -1,0 +1,10 @@
+{
+  "frameworks": {
+    "net46":{
+      "dependencies": {
+        "Microsoft.Azure.KeyVault": "1.0.0",
+        "CrmNugetPackage": "1.0.1"
+      }
+    }
+   }   
+}
