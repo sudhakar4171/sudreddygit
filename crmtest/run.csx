@@ -7,9 +7,15 @@ using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using Microsoft.Azure.KeyVault;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Microsoft.ApplicationInsights;
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
+    TelemetryClient appInsightsClient = new TelemetryClient();
+
+    appInsightsClient.TrackEvent("PluginStart");
+    appInsightsClient.TrackTrace("Started executing Plugin");
+
     IServiceProvider serviceProvider = SandboxWorker.GetIServiceProvider(req.Content.ReadAsAsync<WebsiteContext>().Result);
 
     IPluginExecutionContext context = (IPluginExecutionContext)
@@ -20,13 +26,10 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
 
     var organizationService = organizationServiceFactory.CreateOrganizationService(context.UserId);
 
-
     QueryExpression query = new QueryExpression("account");
     query.ColumnSet.AllColumns = true;
 
     var accounts = organizationService.RetrieveMultiple(query);
-
-    log.Info($"Total accounts count = {accounts.TotalRecordCount}");
 
     log.Info($"C# HTTP trigger function processed a request. RequestUri={req.RequestUri}");
 
@@ -58,6 +61,9 @@ public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceW
         decryptedString = Encoding.UTF8.GetString(bytesDecrypted);
     }
 
+    appInsightsClient.TrackEvent("PluginEnd");
+    appInsightsClient.TrackTrace("End of Plugin Execution");
+
     return req.CreateResponse(HttpStatusCode.OK, context);
 
 }
@@ -67,7 +73,7 @@ private static async Task<string> GetToken(string authority, string resource, st
 {
     var authContext = new AuthenticationContext(authority);
     ClientCredential clientCred = new ClientCredential("78a191c0-a24d-4508-a908-38709541c594",
-                                                       "SFrnl8PhQESeEmn2HF+74BHENM16CguGONGLjtA1gEc=");
+                                                       Environment.GetEnvironmentVariable("Azure_Key_Vault_Secret"));
     AuthenticationResult result = await authContext.AcquireTokenAsync(resource, clientCred);
 
     if (result == null)

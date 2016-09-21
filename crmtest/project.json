@@ -3,7 +3,8 @@
     "net46":{
       "dependencies": {
         "Microsoft.Azure.KeyVault": "1.0.0",
-        "CrmNugetPackage": "1.0.1"
+        "CrmNugetPackage": "1.0.1",
+        "Microsoft.ApplicationInsights": "2.1.0"
       }
     }
    }   
