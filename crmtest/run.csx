@@ -11,7 +11,7 @@ using Microsoft.ApplicationInsights;
 
 public static async Task<HttpResponseMessage> Run(HttpRequestMessage req, TraceWriter log)
 {
-    TelemetryClient appInsightsClient = new TelemetryClient(InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY"));
+    TelemetryClient appInsightsClient = new TelemetryClient { InstrumentationKey = Environment.GetEnvironmentVariable("APPINSIGHTS_INSTRUMENTATIONKEY") };
 
     appInsightsClient.TrackEvent("PluginStart");
     appInsightsClient.TrackTrace("Started executing Plugin");
